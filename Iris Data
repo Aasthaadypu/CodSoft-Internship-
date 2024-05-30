@@ -1,0 +1,132 @@
+# Importing Libraries
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.express as px
+import seaborn as sns
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder 
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection  import cross_val_score
+from imblearn.over_sampling import SMOTE
+from sklearn.metrics import precision_score, recall_score, f1_score, mean_squared_error
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+from sklearn.cluster import KMeans
+
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense,Dropout
+
+import warnings
+warnings.filterwarnings("ignore")
+
+data= pd.read_csv('/kaggle/input/iris-dataset/IRIS.csv')
+data
+
+data.describe()
+
+Value1 = data['value1'].value_counts().reset_index()
+Value1
+
+plt.figure(figsize=(8,8))
+plt.pie(Species['count'],labels=['Iris-setosa','Iris-versicolor','Iris-virginica'],autopct='%1.3f%%',explode=[0,0,0])
+plt.legend(loc='upper left')
+plt.show()
+
+plt.figure(figsize=(8,8))
+plt.pie(Species['count'],labels=['Iris-setosa','Iris-versicolor','Iris-virginica'],autopct='%1.3f%%',explode=[0,0,0])
+plt.legend(loc='upper left')
+plt.show()
+
+fig = px.scatter_3d(data, x='sepal_length', y='petal_width', z='petal_length', color='species')
+fig.show()
+
+def evaluate(model):
+  model.fit(X_train,y_train)
+  pre = model.predict(X_test)
+    
+  accuracy = accuracy_score(pre,y_test)
+
+  sns.heatmap(confusion_matrix(pre,y_test),annot=True)
+  print(model)
+  print('Accuracy : ',accuracy)
+
+model_LR = LogisticRegression()
+
+lsr_best = LogisticRegression(penalty='l2',C=1000.0,random_state = 42)
+lsr_clf = lsr_best.fit(X_train,y_train)
+evaluate(lsr_clf)
+
+model_KNN = KNeighborsClassifier()
+
+k_range = np.arange(1, 20, 2)
+scores = [] #to store cross val score for each k
+for k in k_range:
+  model_KNN  = KNeighborsClassifier(n_neighbors=k)
+  model_KNN .fit(X_train,y_train)
+  score = cross_val_score(model_KNN , X_train, y_train, cv=3, n_jobs = -1)
+  scores.append(score.mean())
+
+#Storing the mean squared error to decide optimum k
+mse = [1-x for x in scores]
+
+plt.figure(figsize=(20,8))
+plt.subplot(121)
+sns.lineplot(x=k_range,y=mse,markers=True,dashes=False)
+plt.xlabel("Value of K")
+plt.ylabel("Mean Squared Error")
+plt.subplot(122)
+sns.lineplot(x=k_range,y=scores,markers=True,dashes=False)
+plt.xlabel("Value of K")
+plt.ylabel("Cross Validation Accuracy")
+
+plt.show()
+
+knn = KNeighborsClassifier(n_neighbors=7)
+
+knn_clf = knn.fit(X_train,y_train)
+
+evaluate(knn_clf)
+
+model_RFC = RandomForestClassifier()
+
+rf = RandomForestClassifier(max_depth=9, n_estimators=50)
+RFC_clf = rf.fit(X_train,y_train)
+
+evaluate(RFC_clf)
+
+model_SVM = SVC()
+
+svc = SVC()
+svc_clf = svc.fit(X_train, y_train)
+evaluate(svc_clf)
+
+model_DT = DecisionTreeClassifier()
+
+DT = model_DT.fit(X_train, y_train)
+evaluate(svc_clf)
+
+kmeans = KMeans(n_clusters = 3, init = 'k-means++', max_iter = 300, n_init = 10, random_state = 42)
+y_kmeans = kmeans.fit_predict(X)
+
+plt.scatter(X[y_kmeans == 0, 0], X[y_kmeans == 0, 1], 
+            s = 100, c = 'red', label = 'Iris-setosa')
+plt.scatter(X[y_kmeans == 1, 0], X[y_kmeans == 1, 1], 
+            s = 100, c = 'blue', label = 'Iris-versicolour')
+plt.scatter(X[y_kmeans == 2, 0], X[y_kmeans == 2, 1],
+            s = 100, c = 'green', label = 'Iris-virginica')
+
+# Plotting the centroids of the clusters
+plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:,1], 
+            s = 100, c = 'yellow', label = 'Centroids')
+
+plt.legend()
+
