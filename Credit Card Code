@@ -1,5 +1,5 @@
-#import some libraries
-
+#import some libraries and do this with any of the softwares(python). 
+#Use some credit score functions(deletion and addition), with index values.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -55,6 +55,9 @@ print("Length of X_train is: {X_train}".format(X_train = len(X_train)))
 print("Length of X_test is: {X_test}".format(X_test = len(X_test)))
 print("Length of y_train is: {y_train}".format(y_train = len(y_train)))
 print("Length of y_test is: {y_test}".format(y_test = len(y_test)))
+print("Array of y_test is: {y_test}".format(y_test = arr(y_test)))
+
+#import binary linear regression model and train, test and regress the matrices.
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
